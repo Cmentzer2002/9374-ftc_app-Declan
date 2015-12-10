@@ -12,26 +12,49 @@ import com.qualcomm.robotcore.util.Range;
  */
 public class TeleOp extends OpMode {
     float startTime;
+    double servo3Pos;
+    double servo4Pos;
+    double servo5Pos;
     boolean servoPos;
+    boolean direction;
+    boolean aDown;
     Servo servo1;
     Servo servo2;
     Servo servo3;
     Servo servo4;
+    Servo servo5;
     DcMotor MotorRight_F;
     DcMotor MotorLeft_F;
     DcMotor MotorRight_B;
     DcMotor MotorLeft_B;
-
     @Override
     public void init() {
+        // True: Plow is on the backside of the robot, False: Plow is on the front.
+        direction = true;
+        aDown = false;
         startTime = 0;
         servoPos = true;
+        servo3Pos = 0;
+        servo4Pos = 0;
+        servo5Pos = 0;
         MotorRight_F = hardwareMap.dcMotor.get("RightMotorF");
         MotorLeft_F = hardwareMap.dcMotor.get("LeftMotorF");
         MotorRight_B = hardwareMap.dcMotor.get("RightMotorB");
         MotorLeft_B = hardwareMap.dcMotor.get("LeftMotorB");
-//        MotorRight_F.setDirection(DcMotor.Direction.REVERSE);
-//        MotorRight_B.setDirection(DcMotor.Direction.REVERSE);
+        // True: Plow is on the backside of the robot, False: Plow is on the front.
+        if (direction) {
+            // Plow is on the backside
+            MotorRight_F.setDirection(DcMotor.Direction.REVERSE);
+            MotorRight_B.setDirection(DcMotor.Direction.REVERSE);
+            MotorLeft_F.setDirection(DcMotor.Direction.FORWARD);
+            MotorLeft_B.setDirection(DcMotor.Direction.FORWARD);
+        } else if (!direction) {
+            // Plow is on the front
+            MotorRight_F.setDirection(DcMotor.Direction.FORWARD);
+            MotorRight_B.setDirection(DcMotor.Direction.FORWARD);
+            MotorLeft_F.setDirection(DcMotor.Direction.REVERSE);
+            MotorLeft_B.setDirection(DcMotor.Direction.REVERSE);
+        }
         MotorLeft_F.setChannelMode(DcMotorController.RunMode.RUN_WITHOUT_ENCODERS);
         MotorRight_F.setChannelMode(DcMotorController.RunMode.RUN_WITHOUT_ENCODERS);
         MotorLeft_B.setChannelMode(DcMotorController.RunMode.RUN_WITHOUT_ENCODERS);
@@ -40,11 +63,11 @@ public class TeleOp extends OpMode {
         servo2 = hardwareMap.servo.get("servo2");
         servo3 = hardwareMap.servo.get("servo3");
         servo4 = hardwareMap.servo.get("servo4");
-        servo1.setPosition(0);
-        servo2.setPosition(1);
+        servo5 = hardwareMap.servo.get("servo5");
+        servo1.setPosition(1);
+        servo2.setPosition(0);
         servo3.setPosition(1);
         servo4.setPosition(0);
-
     }
 
     @Override
@@ -55,16 +78,44 @@ public class TeleOp extends OpMode {
         float leftMotor_B = 0;
         double leftTrigger = 0;
         double rightTrigger = 0;
-        Range.clip(rightMotor_F, -1, 1);
-        Range.clip(rightMotor_B, -1, 1);
-        Range.clip(leftMotor_F, -1, 1);
-        Range.clip(leftMotor_B, -1, 1);
-        Range.clip(leftTrigger, 0, 1);
-        Range.clip(rightTrigger, 0, 1);
-        leftMotor_F = gamepad1.left_stick_y;
-        leftMotor_B = gamepad1.left_stick_y;
-        rightMotor_F = gamepad1.right_stick_y;
-        rightMotor_B = gamepad1.right_stick_y;
+        rightMotor_F = Range.clip(rightMotor_F, -1, 1);
+        rightMotor_B = Range.clip(rightMotor_B, -1, 1);
+        leftMotor_F = Range.clip(leftMotor_F, -1, 1);
+        leftMotor_B = Range.clip(leftMotor_B, -1, 1);
+        leftTrigger = Range.clip(leftTrigger, 0, 1);
+        rightTrigger = Range.clip(rightTrigger, 0, 1);
+        if (gamepad1.a && !aDown) {
+            aDown = true;
+        } else if (!gamepad1.a && aDown) {
+            if (direction) {
+                direction = false;
+            } else {
+                direction = true;
+            }
+            aDown = false;
+        }
+        // True: Plow is on the backside of the robot, False: Plow is on the front.
+        if (direction) {
+            // Plow is on the backside
+            MotorRight_F.setDirection(DcMotor.Direction.REVERSE);
+            MotorRight_B.setDirection(DcMotor.Direction.REVERSE);
+            MotorLeft_F.setDirection(DcMotor.Direction.FORWARD);
+            MotorLeft_B.setDirection(DcMotor.Direction.FORWARD);
+            leftMotor_F = gamepad1.right_stick_y;
+            leftMotor_B = gamepad1.right_stick_y;
+            rightMotor_F = gamepad1.left_stick_y;
+            rightMotor_B = gamepad1.left_stick_y;
+        } else if (!direction) {
+            // Plow is on the front
+            MotorRight_F.setDirection(DcMotor.Direction.FORWARD);
+            MotorRight_B.setDirection(DcMotor.Direction.FORWARD);
+            MotorLeft_F.setDirection(DcMotor.Direction.REVERSE);
+            MotorLeft_B.setDirection(DcMotor.Direction.REVERSE);
+            leftMotor_F = gamepad1.left_stick_y;
+            leftMotor_B = gamepad1.left_stick_y;
+            rightMotor_F = gamepad1.right_stick_y;
+            rightMotor_B = gamepad1.right_stick_y;
+        }
         telemetry.addData("Stick / Motor Values Before Modification", leftMotor_F);
         if (!gamepad1.left_bumper) {
             leftMotor_F = leftMotor_F / 3;
@@ -81,7 +132,7 @@ public class TeleOp extends OpMode {
         MotorLeft_F.setPower(leftMotor_F);
         MotorLeft_B.setPower(leftMotor_B);
         leftTrigger = gamepad2.left_trigger;
-        servo1.setPosition(leftTrigger);
+        servo2.setPosition(leftTrigger);
         if (gamepad2.right_trigger > 0.5) {
             rightTrigger = 0;
         } else if (gamepad2.right_trigger < 0.5) {
@@ -91,7 +142,7 @@ public class TeleOp extends OpMode {
         } else {
             rightTrigger = 1;
         }
-        servo2.setPosition(rightTrigger);
+        servo1.setPosition(rightTrigger);
 //        if (gamepad2.a) {
 //            if (startTime == 0) {
 //                startTime = System.currentTimeMillis();
@@ -106,15 +157,32 @@ public class TeleOp extends OpMode {
 //            }
 //}
 
-        if (gamepad2.a) {
-            servo4.setPosition(1);
-            servo3.setPosition(0);
-        }
-        if (gamepad2.b) {
-            servo4.setPosition(0);
-            servo3.setPosition(1);
-        }
+//        if (gamepad2.a) {
+//            servo4.setPosition(1);
+//            servo3.setPosition(0);
+//        }
+//        if (gamepad2.b) {
+//            servo4.setPosition(0);
+//            servo3.setPosition(1);
+//        }
 
+        if (gamepad2.left_stick_y >= 0.2) {
+            servo3Pos -= 0.1;
+            servo4Pos += 0.1;
+        } else if (gamepad2.left_stick_y <= -0.2) {
+            servo3Pos += 0.1;
+            servo4Pos -= 0.1;
+        }
+        if (gamepad2.right_stick_y >= 0.2) {
+            servo5Pos += 0.1;
+        } else if (gamepad2.right_stick_y <= -0.2) {
+            servo5Pos -= 0.1;
+        }
+        servo3Pos = Range.clip(servo3Pos, 0, 1);
+        servo4Pos = Range.clip(servo4Pos, 0, 1);
+        servo3.setPosition(servo3Pos);
+        servo4.setPosition(servo4Pos);
+        servo5.setPosition(servo5Pos);
 //        if (gamepad2.a) {
 //            if (servoPos) {
 //                servo4.setPosition(Range.clip(servo4.getPosition() - 0.2, 0, 0.8));
