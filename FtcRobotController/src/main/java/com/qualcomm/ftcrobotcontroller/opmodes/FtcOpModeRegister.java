@@ -58,17 +58,15 @@ public class FtcOpModeRegister implements OpModeRegister {
     manager.register(" ", DoNothing.class);
     manager.register("Autonomous", Autonomous_MoveWithTime.class);
     manager.register("Autonomous, With Delay of ~5s", Autonomous_MoveWithTimeDelay.class);
+    manager.register("Autonomous Move on Ramp ( ~10s Starting Delay )", Autonomous_WheelOnRamp.class);
     manager.register("Do Nothing", DoNothing.class);
     manager.register("  ", DoNothing.class);
     manager.register("Move 10 Rotations", Autonomous_MoveOneRotation.class);
-//    manager.register("Bob", BOB_THE_PROGRAM.class);
-//    manager.register("TestingTeleop", TestingTeleop.class);
-//    manager.register("EncoderTesting", EncoderTesting.class);
-//    manager.register("NullOp", NullOp.class);
-//
-//    manager.register("K9TeleOp", K9TeleOp.class);
-//    manager.register ("PushBotAuto", PushBotAuto.class);
-//    manager.register ("PushBotManual", PushBotManual.class);
+    manager.register("   ", DoNothing.class);
+    manager.register("Motor Test", RunMotor.class);
+    manager.register("Move Forever", MoveForever.class);
+    manager.register("Arm Test", ArmTest.class);
+    manager.register("Encoder Move to Ramp", Autonomous_MoveToRamp.class);
 
     /*
      * Uncomment any of the following lines if you want to register an op mode.

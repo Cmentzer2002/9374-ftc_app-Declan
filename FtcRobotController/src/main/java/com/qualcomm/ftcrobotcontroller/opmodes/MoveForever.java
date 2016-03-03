@@ -7,16 +7,20 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 /**
  * Created by Declan Freeeman-Gleason on 11/21/2015.
+ * A small change
  */
-public class Autonomous_MoveWithTimeDelay extends OpMode {
-    double startTime;
+public class MoveForever extends OpMode {
+    Servo servo1;
+    Servo servo2;
+    Servo servo3;
+    Servo servo4;
+	Servo servo5;
     DcMotor MotorRight_F;
     DcMotor MotorLeft_F;
     DcMotor MotorRight_B;
     DcMotor MotorLeft_B;
     @Override
     public void init() {
-        startTime = 0;
         MotorRight_F = hardwareMap.dcMotor.get("RightMotorF");
         MotorLeft_F = hardwareMap.dcMotor.get("LeftMotorF");
         MotorRight_B = hardwareMap.dcMotor.get("RightMotorB");
@@ -25,36 +29,27 @@ public class Autonomous_MoveWithTimeDelay extends OpMode {
         MotorRight_B.setDirection(DcMotor.Direction.REVERSE);
         MotorLeft_F.setDirection (DcMotor.Direction.FORWARD);
         MotorLeft_B.setDirection (DcMotor.Direction.FORWARD);
-        MotorLeft_F.setChannelMode(DcMotorController.RunMode.RUN_WITHOUT_ENCODERS);
-        MotorRight_F.setChannelMode(DcMotorController.RunMode.RUN_WITHOUT_ENCODERS);
+        MotorLeft_F.setChannelMode (DcMotorController.RunMode.RUN_WITHOUT_ENCODERS);
+        MotorRight_F.setChannelMode (DcMotorController.RunMode.RUN_WITHOUT_ENCODERS);
         MotorLeft_B.setChannelMode(DcMotorController.RunMode.RUN_WITHOUT_ENCODERS);
         MotorRight_B.setChannelMode(DcMotorController.RunMode.RUN_WITHOUT_ENCODERS);
-    }
-
-    @Override
-    public void start() {
-        startTime = System.currentTimeMillis();
-        telemetry.addData("Debug", System.currentTimeMillis() - startTime);
-        while (System.currentTimeMillis() - startTime <= 5002){
-            //Do Nothing
-        }
-        super.start();
+		servo1 = hardwareMap.servo.get("servo1");
+		servo2 = hardwareMap.servo.get("servo2");
+		servo3 = hardwareMap.servo.get("servo3");
+		servo4 = hardwareMap.servo.get("servo4");
+		servo5 = hardwareMap.servo.get("servo5");
+		servo1.setPosition(1);
+		servo2.setPosition(0);
+		servo3.setPosition(0);
+		servo4.setPosition(1);
+		servo5.setPosition(1);
     }
 
     @Override
     public void loop() {
-        if (System.currentTimeMillis() - startTime <= 8502) {
-            telemetry.addData("Debug", System.currentTimeMillis() - startTime);
-            MotorLeft_F.setPower(0.25);
-            MotorRight_F.setPower(0.25);
-            MotorRight_B.setPower(0.25);
-            MotorLeft_B.setPower(0.25);
-        } else {
-            telemetry.addData("Debug", "Done with program.");
-            MotorLeft_F.setPower(0);
-            MotorRight_F.setPower(0);
-            MotorRight_B.setPower(0);
-            MotorLeft_B.setPower(0);
-        }
+        MotorLeft_F.setPower(0.25);
+        MotorRight_F.setPower(0.25);
+        MotorRight_B.setPower(0.25);
+        MotorLeft_B.setPower(0.25);
     }
 }
